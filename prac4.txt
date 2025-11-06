@@ -1,32 +1,32 @@
 delimiter //
 create procedure return_book(in p_roll int, in p_name varchar(50))
 begin
-  declare v_issue date;
-  declare v_days int;
-  declare v_fine int default 0;
+declare v_issue date;
+declare v_days int;
+declare v_fine int default 0;
 
-  select dateofissue into v_issue
-  from borrower
-  where rollno = p_roll and nameofbook = p_name and status = 'i';
+select dateofissue into v_issue
+from borrower
+where rollno = p_roll and nameofbook = p_name and status = 'i';
 
-  set v_days = datediff(curdate(), v_issue);
+set v_days = datediff(curdate(), v_issue);
 
-  if v_days > 30 then
-    set v_fine = v_days * 50;
-  elseif v_days >= 15 then
-    set v_fine = v_days * 5;
-  else
-    set v_fine = 0;
-  end if;
+if v_days > 30 then
+set v_fine = v_days * 50;
+elseif v_days >= 15 then
+set v_fine = v_days * 5;
+else
+set v_fine = 0;
+end if;
 
-  update borrower set status = 'r'
-  where rollno = p_roll and nameofbook = p_name;
+update borrower set status = 'r'
+where rollno = p_roll and nameofbook = p_name;
 
-  if v_fine > 0 then
-    insert into fine values(p_roll, curdate(), v_fine);
-  end if;
+if v_fine > 0 then
+insert into fine values(p_roll, curdate(), v_fine);
+end if;
 
-  select concat('book returned! total fine in rs: ', v_fine) as message;
+select concat('book returned! total fine in rs: ', v_fine) as message;
 end;
 //
 delimiter ;
